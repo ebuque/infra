@@ -3,6 +3,7 @@ resource "aws_instance" "dotcomerp" {
   instance_type   = "${var.instance_type}"
   key_name        = var.dotcomerp-keyname
   subnet_id          = aws_subnet.dotcommz-network.id
+  security_groups = [aws_security_group.sg_allow_all_trafic_on_subnet.id, aws_security_group.sg_allow_http_dotcomerp.id]
   monitoring        = true
   private_ip      = var.dotcomerp_ip
   user_data = file("install_dotcomerp.sh")

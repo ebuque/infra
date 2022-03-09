@@ -5,20 +5,20 @@ resource "aws_instance" "bastion-host" {
   monitoring      = true
   subnet_id       = aws_subnet.dotcommz-network.id
   private_ip      = var.bastion_host_ip
-  security_groups = [aws_security_group.sg_allow_ssh_bastion.id]
+  security_groups = [aws_security_group.sg_allow_ssh_bastion.id, aws_security_group.sg_allow_all_trafic_on_subnet.id]
   user_data = file("install_bastion.sh")
 
   # Copies the .pem files to /home/ubuntu/
-  // provisioner "file" {
-  //   source      = "certs/jenkins-master.pem"
-  //   destination = "/home/ubuntu/jenkins-master.pem"
-  //   connection {
-  //     type        = "ssh"
-  //     user        = "ubuntu"
-  //     private_key = "${file("certs/bastion-host.pem")}"
-  //     host        = "${self.public_dns}"
-  //   }
-  // }
+  provisioner "file" {
+    source      = "dotcomerp-keyname.pem"
+    destination = "/home/ubuntu/dotcomerp-keyname.pem"
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = "${file("bastion.pem")}"
+      host        = "${self.public_dns}"
+    }
+  }
 
   associate_public_ip_address = true
   tags = {
@@ -27,6 +27,8 @@ resource "aws_instance" "bastion-host" {
 
   lifecycle {
     ignore_changes = [
+      ami,
+      user_data
 
     ]
   }
